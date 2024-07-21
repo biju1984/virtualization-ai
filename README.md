@@ -13,10 +13,10 @@ Virtualization.ai is a commercial-grade application that allows users to create 
 ## Project Structure
 
 ```plaintext
-.
+api-mocking-tool/
 ├── LICENSE
 ├── README.md
-├── app
+├── backend
 │   ├── __init__.py
 │   ├── api
 │   │   ├── __init__.py
@@ -62,11 +62,22 @@ Virtualization.ai is a commercial-grade application that allows users to create 
 │       ├── __init__.py
 │       ├── helpers.py
 │       └── validators.py
-├── docs
-│   ├── api_documentation.md
-│   ├── architecture.md
-│   ├── release_notes.md
-│   └── setup_guide.md
+├── frontend
+│   ├── public
+│   │   ├── index.html
+│   │   └── favicon.ico
+│   ├── src
+│   │   ├── assets
+│   │   ├── components
+│   │   ├── pages
+│   │   ├── services
+│   │   ├── App.js
+│   │   ├── index.js
+│   │   └── styles.css
+│   ├── .env
+│   ├── package.json
+│   ├── README.md
+│   └── webpack.config.js
 ├── infra
 │   ├── ci_cd
 │   │   ├── github_actions.yml
@@ -89,7 +100,11 @@ Virtualization.ai is a commercial-grade application that allows users to create 
 │       ├── outputs.tf
 │       ├── provider.tf
 │       └── variables.tf
-├── project-root
+├── docs
+│   ├── api_documentation.md
+│   ├── architecture.md
+│   ├── release_notes.md
+│   └── setup_guide.md
 └── requirements.txt
 
 ## Getting Started

@@ -1,0 +1,78 @@
+User Interaction for API Mockup Tool:
+  Clarifying Requirements:
+    Examples of Follow-up Questions:
+    - What details about the user?
+    - Include query parameters/headers?
+    - Sample request/response?
+    Identifying Gaps and Ambiguities:
+      Analyze Initial Specification: null
+      Generate Follow-up Questions: null
+    Predefined Options for Attributes:
+      Common Attributes: null
+      User Selection: null
+  Confirming and Saving Specification:
+    Review and Confirmation:
+      Display Final Specification: null
+      Highlight Changes/Additions: null
+      Save with Version Number: null
+      User Confirmation/Modification: null
+    Version Control:
+      Revert to Previous Versions: null
+      Save to Database: null
+      Track Changes: null
+  Error Handling and Validation:
+    Error Messages and Recovery:
+      Clear Error Messages: null
+      Recovery Options: null
+      Retry Process: null
+    Input Validation:
+      Provide Feedback: null
+      Request Corrections: null
+      Validate User Inputs: null
+    Response Validation:
+      Handle Malformed/Incomplete Responses: null
+      Validate OpenAI Responses: null
+  Handling Different User Scenarios:
+    Non-Technical User:
+      Examples and Templates: null
+      Generate Basic Specification: null
+      Provide High-Level Description: null
+      Select Predefined Attributes/Endpoints: null
+      Simple, Guided Questions: null
+    Technical User:
+      Add Endpoints/Parameters/Responses: null
+      Identify Enhancements: null
+      Manual Specification Editing: null
+      Upload Detailed OpenAPI Spec: null
+  Iterative Refinement:
+    Display Updated Specification: null
+    Iteration Limit: null
+    Iterative Process:
+      Series of Questions: null
+      Update Specification: null
+      User Answers: null
+  Processing Initial Input:
+    File Upload Handling:
+      Generate Preliminary Specification: null
+      Parse Uploaded File: null
+      Validate Parsed Content: null
+    Text Prompt Handling:
+      Example OpenAI Prompt: null
+      Receive and Parse Response: null
+      Use OpenAI for Initial Specification: null
+      Validate Response: null
+  Starting a New API:
+    Choose Input Method:
+      File Upload:
+        Parse File and Display Summary: null
+        Upload OpenAPI Spec, JSON, or YAML: null
+      Text Prompt:
+        Enter High-Level Description: null
+        Example: Fetch user details by user ID
+  Welcome Screen:
+    Display Welcome Message: null
+    Explain Tool Capabilities: null
+    Options:
+    - Create New API
+    - Modify Existing API
+    Provide Tutorial/Guided Tour: null

@@ -1,12 +1,12 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional, Dict, Any
 
 class APIGenerationRequest(BaseModel):
     description: str
-    structures: Optional[dict] = None
+    structures: Optional[Dict[str, Any]] = None
 
 class APIGenerationResponse(BaseModel):
-    api_spec: dict
+    api_spec: Dict[str, Any]
 
 class APIUploadResponse(BaseModel):
     message: str

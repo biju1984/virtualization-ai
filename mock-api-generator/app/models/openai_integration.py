@@ -1,7 +1,8 @@
 import openai
+from app.core.config import settings
 
 def get_openai_response(prompt: str) -> dict:
-    openai.api_key = "your_openai_api_key"
+    openai.api_key = settings.OPENAI_API_KEY
     try:
         response = openai.Completion.create(
             engine="davinci-codex",

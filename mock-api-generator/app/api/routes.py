@@ -1,7 +1,20 @@
-
-from fastapi import APIRouter, UploadFile, File, Form
-from app.api.services import process_natural_language, parse_structures, generate_suggestions, finalize_api, publish_api, test_api, generate_api
-from app.api.schemas import APIGenerationRequest, APIGenerationResponse, APIUploadResponse
+from fastapi import APIRouter, UploadFile, File, Form, Depends
+from sqlalchemy.orm import Session
+from pymongo.errors import ConnectionFailure
+from app.services.api_service import (
+    process_natural_language,
+    parse_structures,
+    generate_suggestions,
+    finalize_api,
+    publish_api,
+    test_api,
+    generate_api,
+    save_specification,
+    get_specification,
+    check_openai_health
+)
+from app.models.database import get_db, mongo_db
+from app.schemas.api_schemas import APIGenerationRequest, APIGenerationResponse, APIUploadResponse
 
 router = APIRouter()
 
@@ -13,22 +26,39 @@ async def process_natural_language(description: str = Form(...)):
 async def upload_structures(request: UploadFile = File(...), response: UploadFile = File(...)):
     return await parse_structures(request, response)
 
-@router.post("/generate_suggestions", response_model=APIGenerationResponse)
-async def generate_suggestions(request: APIGenerationRequest):
-    return await generate_suggestions(request)
+@router.post("/save_specification")
+async def save_specification_route(name: str = Form(...), description: str = Form(...), spec_type: str = Form(...), spec: UploadFile = File(...)):
+    content = await spec.read()
+    if spec_type == 'json':
+        spec_data = process_json(content)
+    else:
+        spec_data = process_yaml(content)
+    spec_id = save_specification(name, description, spec_type, spec_data)
+    return {"spec_id": spec_id}
 
-@router.post("/finalize_api", response_model=APIGenerationResponse)
-async def finalize_api(request: APIGenerationRequest):
-    return await finalize_api(request)
+@router.get("/get_specification/{spec_id}")
+async def get_specification_route(spec_id: str):
+    spec = get_specification(spec_id)
+    if not spec:
+        return {"error": "Specification not found"}
+    return {"spec": spec}
 
-@router.post("/publish_api", response_model=APIUploadResponse)
-async def publish_api(api_id: str):
-    return await publish_api(api_id)
+@router.get("/healthcheck/postgresql")
+async def postgresql_healthcheck(db: Session = Depends(get_db)):
+    try:
+        db.execute("SELECT 1")
+        return {"status": "healthy"}
+    except Exception as e:
+        return {"status": "unhealthy", "detail": str(e)}
 
-@router.post("/test_api")
-async def test_api(api_id: str, request_data: dict):
-    return await test_api(api_id, request_data)
+@router.get("/healthcheck/mongodb")
+async def mongodb_healthcheck():
+    try:
+        mongo_db.command("ping")
+        return {"status": "healthy"}
+    except ConnectionFailure as e:
+        return {"status": "unhealthy", "detail": str(e)}
 
-@router.post("/generate")
-async def generate_api_endpoint(request: APIGenerationRequest):
-    return await generate_api(request)
+@router.get("/healthcheck/openai")
+async def openai_healthcheck():
+    return await check_openai_health()

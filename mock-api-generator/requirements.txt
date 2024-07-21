@@ -1,9 +1,17 @@
-
-
 fastapi
 uvicorn
-openai==1.0.0
+sqlalchemy
+psycopg2-binary
+pymongo
 pydantic
+pydantic-settings
+alembic
+openai
 python-dotenv
 pandas
 fpdf
+# Optional dependencies for additional features
+# gunicorn==20.1.0  # If you are deploying to a production server
+# psycopg2-binary==2.9.1  # If you are using PostgreSQL
+# aiomysql==0.0.21  # If you are using MySQL
+# aiohttp==3.8.0  # If you need to make async HTTP requests

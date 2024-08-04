@@ -1,76 +1,78 @@
 import json
 import yaml
 from datetime import datetime
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException
 from bson.objectid import ObjectId
+from sqlalchemy.orm import Session
 from app.models.specification import Specification
 from app.models.database import SessionLocal, mongo_db
 from app.schemas.api_schemas import APIGenerationRequest
-from fastapi.exceptions import HTTPException
-
 from app.core.config import settings
 from openai import OpenAI
 
 # Initialize OpenAI with the API key
-client = OpenAI()
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 async def process_natural_language(description: str):
     try:
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",  # Replace with the model you are using
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": f"Generate an API specification for the following description: {description}"}
-            ]
+            ],
+            max_tokens=10000
         )
-        specification = completion.choices[0].message['content'].strip()
-        print(f"Generated completion: {completion}")
-        return {"specification": specification}
+        specification = completion
+        return  specification
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI API error: {str(e)}")
 
 async def check_openai_health():
     try:
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",  # Replace with the model you are using
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": "This is a health check."}
-            ]
+            ],
+            max_tokens=10
         )
         return {"status": "healthy"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI is unhealthy: {str(e)}")
 
-
 def process_yaml(content: bytes) -> dict:
     try:
         return yaml.safe_load(content)
     except yaml.YAMLError as e:
-        return {"error": "Failed to parse YAML"}
+        raise HTTPException(status_code=400, detail=f"Failed to parse YAML: {str(e)}")
 
 def process_json(content: bytes) -> dict:
     try:
         return json.loads(content)
     except json.JSONDecodeError as e:
-        return {"error": "Failed to parse JSON"}
+        raise HTTPException(status_code=400, detail=f"Failed to parse JSON: {str(e)}")
 
 def save_specification(name: str, description: str, spec_type: str, spec: dict):
     if settings.DB_TYPE == 'postgresql':
         db = SessionLocal()
-        last_spec = db.query(Specification).order_by(Specification.version.desc()).first()
-        new_version = (last_spec.version + 1) if last_spec else 1
-        new_spec = Specification(
-            name=name,
-            description=description,
-            version=new_version,
-            spec_type=spec_type,
-            spec=spec
-        )
-        db.add(new_spec)
-        db.commit()
-        db.refresh(new_spec)
-        return new_spec.id
+        try:
+            last_spec = db.query(Specification).order_by(Specification.version.desc()).first()
+            new_version = (last_spec.version + 1) if last_spec else 1
+            new_spec = Specification(
+                name=name,
+                description=description,
+                version=new_version,
+                spec_type=spec_type,
+                spec=spec
+            )
+            db.add(new_spec)
+            db.commit()
+            db.refresh(new_spec)
+            return new_spec.id
+        finally:
+            db.close()
     elif settings.DB_TYPE == 'mongodb':
         collection = mongo_db['specifications']
         spec_doc = {
@@ -88,10 +90,13 @@ def save_specification(name: str, description: str, spec_type: str, spec: dict):
 def get_specification(spec_id: str):
     if settings.DB_TYPE == 'postgresql':
         db = SessionLocal()
-        spec = db.query(Specification).filter(Specification.id == spec_id).first()
-        if not spec:
-            return None
-        return json.loads(spec.spec)
+        try:
+            spec = db.query(Specification).filter(Specification.id == spec_id).first()
+            if not spec:
+                return None
+            return json.loads(spec.spec)
+        finally:
+            db.close()
     elif settings.DB_TYPE == 'mongodb':
         collection = mongo_db['specifications']
         spec = collection.find_one({"_id": ObjectId(spec_id)})
@@ -99,22 +104,15 @@ def get_specification(spec_id: str):
             return None
         return spec
 
-async def process_natural_language(description: str):
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=description,
-        max_tokens=100
-    )
-    if not response:
-        return {"error": "Failed to get a response from OpenAI"}
-    return {"response": response.choices[0].text.strip()}
-
 async def parse_structures(request_file: UploadFile, response_file: UploadFile):
-    request_content = await request_file.read()
-    response_content = await response_file.read()
-    request_data = process_json(request_content) if request_file.filename.endswith('.json') else process_yaml(request_content)
-    response_data = process_json(response_content) if response_file.filename.endswith('.json') else process_yaml(response_content)
-    return {"request": request_data, "response": response_data}
+    try:
+        request_content = await request_file.read()
+        response_content = await response_file.read()
+        request_data = process_json(request_content) if request_file.filename.endswith('.json') else process_yaml(request_content)
+        response_data = process_json(response_content) if response_file.filename.endswith('.json') else process_yaml(response_content)
+        return {"request": request_data, "response": response_data}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing files: {str(e)}")
 
 async def generate_suggestions(request: APIGenerationRequest):
     return await process_natural_language(request.description)

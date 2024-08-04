@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     DB_NAME: str = Field(..., env="DB_NAME")
     MONGO_URI: str = Field(..., env="MONGO_URI")
     SQLALCHEMY_DATABASE_URL: str = Field(..., env="SQLALCHEMY_DATABASE_URL")
+    RELOAD: bool = True
 
     class Config:
         env_file = ".env"

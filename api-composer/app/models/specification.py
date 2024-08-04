@@ -13,3 +13,4 @@ class Specification(Base):
     spec = Column(JSONB, nullable=False)  # Store JSON data directly
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+

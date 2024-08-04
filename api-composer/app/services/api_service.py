@@ -23,8 +23,7 @@ async def process_natural_language(description: str):
             ],
             max_tokens=10000
         )
-        specification = completion
-        return  specification
+        return completion
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI API error: {str(e)}")
 
@@ -128,3 +127,4 @@ async def test_api(api_id: str, request_data: dict):
 
 async def generate_api(request: APIGenerationRequest):
     return await process_natural_language(request.description)
+

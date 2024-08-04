@@ -24,3 +24,4 @@ def get_db():
             db.close()
     elif settings.DB_TYPE == 'mongodb':
         yield mongo_db
+

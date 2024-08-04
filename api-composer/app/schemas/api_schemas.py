@@ -6,7 +6,7 @@ class APIGenerationRequest(BaseModel):
     structures: Optional[Dict[str, Any]] = None
 
 class APIGenerationResponse(BaseModel):
-    api_spec: Dict[str, Any]
+    api_spec: Any
 
 class APIUploadResponse(BaseModel):
     message: str

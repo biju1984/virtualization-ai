@@ -5,8 +5,8 @@ from app.core.config import settings
 openai.api_key = settings.OPENAI_API_KEY
 
 def generate_api_specification(description: str) -> APISpecificationCreate:
-    response = openai.Completion.create(
-        engine="text-davinci-003",
+    response = openai.completions.create(
+        engine="gpt-4o-mini",
         prompt=f"Generate an API specification for the following description: {description}",
         max_tokens=200
     )

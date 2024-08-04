@@ -1,7 +1,8 @@
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from app.utils.faker_utils import generate_fake_data
-from app.models.database import SessionLocal, APISpecification
+from app.models.database import SessionLocal
+from app.models.specification import Specification  # Ensure this import is correct
 
 async def handle_request(project_name: str, api_version: str, endpoint: str, request: Request):
     db = SessionLocal()
@@ -14,10 +15,10 @@ async def handle_request(project_name: str, api_version: str, endpoint: str, req
     return JSONResponse(content=response_data)
 
 def get_api_spec_from_db(project_name: str, api_version: str, endpoint: str, db):
-    spec = db.query(APISpecification).filter_by(
-        project_name=project_name,
-        api_version=api_version,
-        endpoint=endpoint
+    spec = db.query(Specification).filter_by(
+        name=project_name,
+        version=api_version,
+        description=endpoint
     ).first()
     return spec.spec if spec else None
 

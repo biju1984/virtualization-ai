@@ -1,6 +1,6 @@
 # Virtualization.ai
 
-Virtualization.ai is a commercial-grade application that allows users to create API mocks using natural language processing. The application leverages OpenAI's GPT-3 to generate API specifications, provides versioning, and publishes mock APIs that can be accessed via dynamic, user-friendly URLs.
+Virtualization.ai is a commercial-grade application that allows users to create API mocks using natural language processing. The application leverages OpenAI's GPT-4o-mini to generate API specifications, provides versioning, and publishes mock APIs that can be accessed via dynamic, user-friendly URLs.
 
 ## Features
 

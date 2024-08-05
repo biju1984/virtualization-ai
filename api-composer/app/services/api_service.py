@@ -9,12 +9,21 @@ from app.models.database import SessionLocal, mongo_db
 from app.schemas.api_schemas import APIGenerationRequest
 from app.core.config import settings
 from app.services.openai_service import generate_api_specification, health_check_service
+from app.api.handlers.openai.openai_handler import OpenAIHandler
+from app.api.handlers.openai.refine_prompt_handler import RefinePromptHandler
+from app.api.handlers.openai.save_specification_handler import SaveSpecificationHandler
 
 
 async def process_natural_language(description: str):
     try:
-        response = generate_api_specification(description)
-        return {"api_specification": response}
+        request = {'description': description}
+        handler_chain = OpenAIHandler(
+            successor=RefinePromptHandler(
+                successor=SaveSpecificationHandler()
+            )
+        )
+        handler_chain.handle(request)
+        return request
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"OpenAI API error: {str(e)}")

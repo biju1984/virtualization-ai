@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.endpoints.routes import router
+from app.api.endpoints.nlp import router
 
 
 def create_app() -> FastAPI:

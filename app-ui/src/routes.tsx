@@ -15,6 +15,8 @@ import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
 import PermissionsPage from "./pages/PermissionsPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import DashboardPage from "./pages/DashboardPage";
+import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 import useAuth from './hooks/useAuth';
 
 // Private Route component to restrict access based on authentication
@@ -79,6 +81,33 @@ const AppRoutes: React.FC = () => {
               <AdminRoute>
                 <PermissionsPage />
               </AdminRoute>
+            }
+          />
+        </Route>
+
+        {/* Project Management Routes */}
+        <Route
+          path="/projects"
+          element={
+            <PrivateRoute>
+              <MainLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route
+            path=""
+            element={
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path=":projectId"
+            element={
+              <PrivateRoute>
+                <ProjectDetailsPage />
+              </PrivateRoute>
             }
           />
         </Route>

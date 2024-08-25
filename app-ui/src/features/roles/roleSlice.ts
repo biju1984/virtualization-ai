@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
 import { Role } from '../../types/roleTypes';
+import { RootState } from 'store/rootReducer';
 
 interface RolesState {
   roles: Role[];

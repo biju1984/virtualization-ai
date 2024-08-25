@@ -1,9 +1,9 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectUser } from '../auth/authSlice';
+import { selectUserById } from '../../features/users/userSlice';
+import { User } from '../../types/userTypes';
 
-const UserProfile: React.FC = () => {
-  const user = useSelector(selectUser);
+const UserProfile: React.FC<{ userId: string }> = ({ userId }) => {
+  const user = useSelector(selectUserById(userId)) as User | null;
 
   if (!user) {
     return <div>No user logged in</div>;
@@ -11,12 +11,9 @@ const UserProfile: React.FC = () => {
 
   return (
     <div>
-      <h2>User Profile</h2>
-      <p>Name: {user.name}</p>
+      <h1>{user.name}</h1>
       <p>Email: {user.email}</p>
-      {/* Add fields to edit profile */}
+      {/* Other user details */}
     </div>
   );
 };
-
-export default UserProfile;

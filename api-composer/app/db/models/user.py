@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -23,4 +24,3 @@ class User(Base):
 
     def set_password(self, password: str):
         self.hashed_password = pwd_context.hash(password)
-

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     MONGO_URI: str = Field(config.get("MONGO_URI"))
     SQLALCHEMY_DATABASE_URL: str = Field(config.get("SQLALCHEMY_DATABASE_URL"))
     RELOAD: bool = Field(config.get("RELOAD", True))
+    SECRET_KEY: str = Field(config.get("SECRET_KEY"))
 
     @validator("OPENAI_API_KEY")
     def validate_api_key(cls, v):

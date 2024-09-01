@@ -10,12 +10,9 @@ psycopg2-binary==2.9.9
 pydantic==2.7.0
 pydantic-settings==2.4.0
 pymongo==4.8.0
-pytest==7.3.2
-python-dotenv==1.0.0
-sqlalchemy
+sqlalchemy==2.0.32  # Specify the correct version here
 uvicorn==0.22.0
-faker
-pydantic
-jose
-passlib[bcrypt]
-debugpy
+faker==26.3.0
+python-dotenv==1.0.0
+jose==1.0.0
+passlib[bcrypt]==1.7.4

@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
-from app.api.endpoints.nlp import router
+from app.routes.index import router
 from app.core.config import settings
 from app.core.logging_config import setup_logging
 from app.healthcheck import perform_health_checks

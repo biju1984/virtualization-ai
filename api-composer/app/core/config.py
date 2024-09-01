@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URL: str = Field(config.get("SQLALCHEMY_DATABASE_URL"))
     RELOAD: bool = Field(config.get("RELOAD", True))
     SECRET_KEY: str = Field(config.get("SECRET_KEY"))
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(
+        config.get("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
     @validator("OPENAI_API_KEY")
     def validate_api_key(cls, v):

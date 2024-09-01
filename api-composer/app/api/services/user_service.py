@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from app.models.database import get_db
 from pydantic import EmailStr
+from app.utils.responses import error_response, success_response
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -20,6 +21,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 def create_user(db: Session, user: UserCreate):
+    # Check if the user already exists
+    existing_user = db.query(User).filter(User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already registered"
+        )
+
+    # Create the new user
     db_user = User(
         email=user.email,
         full_name=user.full_name
@@ -51,19 +61,27 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(payload)
         email: str = payload.get("sub")
         if email is None:
-            raise credentials_exception
+            # Move this error handling outside of the try block
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token does not contain email.",
+            )
     except JWTError:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate token.",
+        )
+
     user = db.query(User).filter(User.email == email).first()
     if user is None:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found.",
+        )
+
     return user

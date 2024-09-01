@@ -1,9 +1,10 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 
 class UserBase(BaseModel):
-    username: str
     email: EmailStr
+    full_name: Optional[str] = None  # Optional full_name field
 
 
 class UserCreate(UserBase):

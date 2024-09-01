@@ -2,13 +2,14 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
-from app.db.models.user import User
+from app.models.user import User
 from app.api.schemas.user import UserCreate
 from app.core.config import settings
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from app.models.database import get_db
+from pydantic import EmailStr
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -20,7 +21,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def create_user(db: Session, user: UserCreate):
     db_user = User(
-        username=user.username,
         email=user.email,
         full_name=user.full_name
     )
@@ -31,8 +31,8 @@ def create_user(db: Session, user: UserCreate):
     return db_user
 
 
-def authenticate_user(db: Session, username: str, password: str):
-    user = db.query(User).filter(User.username == username).first()
+def authenticate_user(db: Session, email: EmailStr, password: str):
+    user = db.query(User).filter(User.email == email).first()
     if not user or not user.verify_password(password):
         return False
     return user
@@ -58,12 +58,12 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = db.query(User).filter(User.username == username).first()
+    user = db.query(User).filter(User.email == email).first()
     if user is None:
         raise credentials_exception
     return user

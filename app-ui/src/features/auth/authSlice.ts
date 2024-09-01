@@ -20,13 +20,13 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk<
   LoginResponse,
-  { username: string; password: string },
+  { email: string; password: string },
   { rejectValue: string }
 >(
   'auth/login',
-  async ({ username, password }, thunkAPI) => {
+  async ({ email, password }, thunkAPI) => {
     try {
-      const data = await loginUser(username, password);
+      const data = await loginUser(email, password);
       return data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || 'Network error, please try again later');

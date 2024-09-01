@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field, FieldValidationInfo, field_validator
 from typing import Optional
+from app.models.role import Role
 
 
 class UserBase(BaseModel):
@@ -22,6 +23,7 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     id: int
     is_active: bool
+    role: Optional[Role]  # Add this line
 
     class Config:
         orm_mode = True

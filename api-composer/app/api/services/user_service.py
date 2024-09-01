@@ -20,7 +20,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-def create_user(db: Session, user: UserCreate):
+def create_user(db: Session, user: UserCreate, role_id: Optional[int] = None):
     # Check if the user already exists
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -32,7 +32,8 @@ def create_user(db: Session, user: UserCreate):
     # Create the new user
     db_user = User(
         email=user.email,
-        full_name=user.full_name
+        full_name=user.full_name,
+        role_id=role_id
     )
     db_user.set_password(user.password)
     db.add(db_user)

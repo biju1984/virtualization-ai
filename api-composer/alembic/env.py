@@ -1,6 +1,10 @@
-from app.models.project import Project  # Import Project model
-from app.models.user import User      # Import User model
-from app.models.database import Base  # Your Base class
+from app.models.database import Base
+from app.models.user import User
+from app.models.project import Project
+from app.models.role import Role
+from app.models.permission import Permission
+from app.models.role_permission import RolePermission
+from app.models.project import Project
 import sys
 import os
 from logging.config import fileConfig

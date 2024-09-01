@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
-from app.models.base import Base
+from app.models.database import Base
 
 
 class Project(Base):

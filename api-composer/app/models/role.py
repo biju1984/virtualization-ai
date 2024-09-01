@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.models.database import Base
+# Import the association table
+from app.models.role_permission import role_permissions
 
 
 class Role(Base):
@@ -15,4 +17,4 @@ class Role(Base):
 
     # Many-to-many relationship with permissions
     permissions = relationship(
-        "Permission", secondary="role_permissions", back_populates="roles")
+        "Permission", secondary=role_permissions, back_populates="roles")

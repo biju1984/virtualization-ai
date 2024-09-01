@@ -8,12 +8,6 @@ import enum
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class UserRole(enum.Enum):
-    USER = "user"
-    ADMIN = "admin"
-    SUPER_ADMIN = "super_admin"
-
-
 class User(Base):
     __tablename__ = 'users'
 
@@ -23,6 +17,9 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
+
+    # This line establishes the relationship
+    projects = relationship("Project", back_populates="user")
 
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     role = relationship("Role", back_populates="users")

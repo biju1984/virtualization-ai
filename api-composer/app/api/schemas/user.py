@@ -20,10 +20,19 @@ class UserCreate(UserBase):
         return v
 
 
+class RoleResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
 class UserResponse(UserBase):
     id: int
     is_active: bool
-    role: Optional[Role]  # Add this line
+    role: Optional[RoleResponse]  # Use RoleResponse schema
 
     class Config:
         orm_mode = True

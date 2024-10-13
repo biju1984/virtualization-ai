@@ -4,6 +4,7 @@ from app.routes.index import router
 from app.core.config import settings
 from app.core.logging_config import setup_logging
 from app.healthcheck import perform_health_checks
+from app.middleware.decryption_middleware import DecryptionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 import debugpy
 
@@ -16,13 +17,14 @@ def create_app() -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=["http://localhost:3001", "http://localhost:3000"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
     app.include_router(router, prefix="/api")
+    app.add_middleware(DecryptionMiddleware)
 
     @app.on_event("startup")
     async def startup_event():

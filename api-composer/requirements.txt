@@ -16,3 +16,4 @@ faker==26.3.0
 python-dotenv==1.0.0
 jose==1.0.0
 passlib[bcrypt]==1.7.4
+cryptography==43.0.1

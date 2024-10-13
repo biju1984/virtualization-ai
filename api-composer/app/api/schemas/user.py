@@ -36,3 +36,14 @@ class UserResponse(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    version: str
+    message: str

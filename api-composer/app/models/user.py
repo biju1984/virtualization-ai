@@ -18,9 +18,8 @@ class User(Base):
     is_active = Column(Boolean(), default=True)
     is_superuser = Column(Boolean(), default=False)
 
-    # This line establishes the relationship
+    # Relationships
     projects = relationship("Project", back_populates="user")
-
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     role = relationship("Role", back_populates="users")
 

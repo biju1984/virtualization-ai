@@ -44,6 +44,17 @@ class LoginRequest(BaseModel):
 
 
 class Token(BaseModel):
-    access_token: str
+    token: str
     version: str
     message: str
+
+
+class User(BaseModel):  # New User schema
+    id: int
+    email: EmailStr
+    full_name: Optional[str] = None
+    is_active: bool
+    role_id: Optional[int] = None
+
+    class Config:
+        orm_mode = True

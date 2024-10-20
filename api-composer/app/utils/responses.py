@@ -1,14 +1,16 @@
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
+from app.core.config import settings
 
 
 def success_response(data=None, message="Operation successful.", status_code=status.HTTP_200_OK):
     return JSONResponse(
         status_code=status_code,
         content={
+            "version": settings.VERSION,
             "status": "success",
             "message": message,
-            "data": data
+            "body": data
         }
     )
 

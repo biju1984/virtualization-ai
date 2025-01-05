@@ -4,6 +4,7 @@ from pymongo.errors import ConnectionFailure
 from app.models.database import get_db, mongo_db
 from fastapi.exceptions import HTTPException
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
 
 async def retry(func, retries=3, delay=1):
@@ -20,7 +21,7 @@ async def retry(func, retries=3, delay=1):
                 raise e
 
 
-async def check_postgresql_health(db: Session):
+async def check_postgresql_health(db: AsyncSession):
     try:
         await retry(lambda: db.execute(text("SELECT 1")))
         print("PostgreSQL is healthy")
@@ -41,10 +42,11 @@ async def check_mongodb_health():
 
 
 async def perform_health_checks():
-    db: Session = next(get_db())
-    postgresql_healthy = await check_postgresql_health(db)
-    mongodb_healthy = await check_mongodb_health()
+    for db in get_db():
+        # postgresql_healthy = await check_postgresql_health(db)
+        mongodb_healthy = await check_mongodb_health()
 
-    if not postgresql_healthy or not mongodb_healthy:
-        raise HTTPException(
-            status_code=500, detail="One or more critical services are unhealthy")
+        if not mongodb_healthy:
+            raise HTTPException(
+                status_code=500, detail="One or more critical services are unhealthy"
+            )

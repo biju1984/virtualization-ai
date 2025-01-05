@@ -30,7 +30,7 @@ class RoleResponse(BaseModel):
 
 
 class UserResponse(UserBase):
-    id: int
+    id: str
     is_active: bool
     role: Optional[RoleResponse]  # Use RoleResponse schema
 

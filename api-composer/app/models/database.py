@@ -17,11 +17,10 @@ mongo_db = mongo_client.get_database()
 
 
 def get_db():
-    if settings.DB_TYPE == 'postgresql':
-        db = SessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
-    elif settings.DB_TYPE == 'mongodb':
-        yield mongo_db
+    # if settings.DB_TYPE == 'postgresql':
+    #     db = SessionLocal()
+    #     try:
+    #         yield db
+    #     finally:
+    #         db.close()
+    yield mongo_db

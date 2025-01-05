@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     HOST: str = Field(config.get("HOST", "127.0.0.1"))
     PORT: int = Field(config.get("PORT", 8000))
     OPENAI_API_KEY: str = Field(config.get("OPENAI_API_KEY"))
-    DB_TYPE: str = Field(config.get("DB_TYPE", "postgresql"))
+    DB_TYPE: str = Field(config.get("DB_TYPE", "mongodb"))
     DB_USERNAME: str = Field(config.get("DB_USERNAME"))
     DB_PASSWORD: str = Field(config.get("DB_PASSWORD"))
     DB_HOST: str = Field(config.get("DB_HOST"))

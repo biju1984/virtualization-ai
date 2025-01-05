@@ -49,9 +49,9 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         db_user = create_user(db, user)
         return success_response(
             data={
-                "id": db_user.id,
-                "email": db_user.email,
-                "full_name": db_user.full_name,
+                "id": db_user["id"],
+                "email": db_user["email"],
+                "full_name": db_user["full_name"],
             },
             message="User registered successfully.",
             status_code=status.HTTP_201_CREATED,

@@ -1,17 +1,15 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
-from sqlalchemy.orm import Session
-from app.models.user import User
-from app.api.schemas.user import UserCreate
-from app.core.config import settings
 from fastapi import Depends, HTTPException, status, Request, Response
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-from app.models.database import get_db
+from pymongo.collection import Collection
+from app.models.database import mongo_db, get_db  # MongoDB instance
+from app.api.schemas.user import UserCreate
+from app.core.config import settings
 from pydantic import EmailStr
 from jose import ExpiredSignatureError
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -59,40 +57,52 @@ def clear_refresh_cookie(response: Response):
     response.delete_cookie(COOKIE_NAME)
 
 
-def authenticate_user(db: Session, email: EmailStr, password: str):
-    """Authenticate user with email and password."""
-    user = db.query(User).filter(User.email == email).first()
-    if not user or not user.verify_password(password):
-        return False
-    return user
+def hash_password(password: str) -> str:
+    """Hash a plain-text password."""
+    return pwd_context.hash(password)
 
 
-def create_user(db: Session, user: UserCreate, role_id: Optional[int] = None):
-    # Check if the user already exists
-    existing_user = db.query(User).filter(User.email == user.email).first()
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a plain-text password against a hashed password."""
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def authenticate_user(db: Collection, email: str, password: str):
+    """Authenticate a user by verifying email and password."""
+    user = db["users"].find_one({"email": email})
+    # Verify hashed password
+    if user and verify_password(password, user["password"]):
+        return user
+    return None
+
+
+def create_user(db: Collection, user: UserCreate, role_id: Optional[int] = None):
+    """Create a new user with MongoDB."""
+    existing_user = db["users"].find_one({"email": user.email})
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email is already registered"
         )
 
-    # Create the new user
-    db_user = User(
-        email=user.email,
-        full_name=user.full_name,
-        role_id=role_id
-    )
-    db_user.set_password(user.password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    # Insert new user data into MongoDB
+    new_user = {
+        "email": user.email,
+        "full_name": user.full_name,
+        "role_id": role_id,
+        "password": hash_password(user.password)  # Store hashed password
+    }
+    result = db["users"].insert_one(new_user)
+    # Convert ObjectId to string
+    new_user['id'] = str(result.inserted_id)
+    return new_user
 
 
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
+def get_current_user(db: Collection = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """Validate the access token from headers and return the user."""
     try:
         # Decode the JWT token
+        # if payload is string decrypt it else process the h6
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
@@ -111,15 +121,15 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
             detail=f"Could not validate token: {str(e)}",
         )
 
-    # Query the database for the user
-    user = db.query(User).filter(User.email == email).first()
+    # Query MongoDB for the user
+    user = db["users"].find_one({"email": email})
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found.",
         )
 
-    # Explicitly return the User model
+    # Explicitly return the user data
     return user
 
 
